@@ -1,0 +1,164 @@
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static 'index.css' %}">
+<link rel="stylesheet" href="{% static 'general.css' %}">
+
+
+<header class="Layout__top-bar">
+    <nav class="top-bar__navigation">
+        <button onclick="mainDivs('users-list', 'groups-list')">Users</button>
+        <button onclick="mainDivs('groups-list', 'users-list')">Groups</button>
+    </nav>
+
+</header>
+
+
+<!-- USERS' LIST -->
+<div id="users-list">
+    <h1 style="text-align: center">Users list</h1>
+
+    <button class="add-something" onclick="myFunction('add-new-user')">Add User</button>
+
+    <div id="add-new-user" class="add-new" style="display: none">
+        <form action="{% url 'groups:add' %}" method="post">
+            {% csrf_token %}
+            <label for="username">Username</label>
+            <input type="text" name="username" placeholder="Username..">
+
+            <label for="group">Group</label>
+            <select id="group" name="group">
+                {% for group in groups %}
+                    <option value="{{ group.name }}">{{ group.name }}</option>
+                {% endfor %}
+            </select>
+            <input class="input-submit" type="submit" value="Submit">
+        </form>
+    </div>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>id</th>
+            <th>Username</th>
+            <th>Created</th>
+            <th>Group</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+
+
+        {% for user in users %}
+            <div id="edit-user" style="display: none">
+                <form action="{% url 'groups:edit' user_id=user.id %}" method="post">
+                    {% csrf_token %}
+                    <label for="username">Username</label>
+                    <input type="text" name="username" placeholder="Username..">
+
+                    <label for="group">Group</label>
+                    <select id="group" name="group">
+                        {% for group in groups %}
+                            <option value="{{ group.name }}">{{ group.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input class="input-submit" name="editUser" type="submit" value="Submit">
+                </form>
+            </div>
+            <tr>
+                <th>{{ forloop.counter }}</th>
+                <th>{{ user.username }}</th>
+                <th>{{ user.created }}</th>
+                <th>{{ user.group.name }}</th>
+                <th class="action-lst">
+                    <a class="edit-button">
+                        <input type="submit" class="input-submit" onclick="myFunction('edit-user')" value="Edit" name="editUser">
+                    </a>
+                    <form action="{% url 'groups:delete' user_id=user.id %}" method="post">
+                        {% csrf_token %}
+                        <input class="input-submit" type="submit" name="delUser" value="Delete">
+                    </form>
+                </th>
+            </tr>
+        {% endfor %}
+
+    </table>
+
+
+</div>
+
+
+<!-- GROUPS' LIST -->
+<div id="groups-list" style="display: none;">
+    <h1 style="text-align: center;">Groups list</h1>
+
+    <div class="add__new">
+        <button class="add-something" onclick="myFunction('add-new-group')">Add Group</button>
+
+        <div id="add-new-group" class="add-new" style="display: none">
+            <form action="{% url 'groups:addGroup' %}" method="post">
+                {% csrf_token %}
+                <label for="name">Name</label>
+                <input type="text" name="name" placeholder="name..">
+
+                <label for="description">Description</label>
+                <input type="text" name="description" placeholder="Description..">
+                <input class="input-submit" type="submit" value="Submit">
+            </form>
+        </div>
+    </div>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+
+        {% for group in groups %}
+            <div id="edit-group" style="display: none">
+                <form action="{% url 'groups:editGroup' group.pk %}" method="post">
+                    {% csrf_token %}
+                    <label for="name">Name</label>
+                    <input type="text" name="name" placeholder="Name..">
+
+                    <label for="description">Description</label>
+                    <input type="text" name="description" placeholder="Description..">
+                    <input class="input-submit" type="submit" value="Submit">
+                </form>
+            </div>
+            <tr>
+                <th>{{ forloop.counter }}</th>
+                <th>{{ group.name }}</th>
+                <th>{{ group.description }}</th>
+                <th class="action-lst">
+                    <a class="edit-button">
+                        <button type="button" onclick="myFunction('edit-group')">Edit</button>
+                    </a>
+                    <form action="{% url 'groups:delete' user_id=group.id %}" method="post">
+                        {% csrf_token %}
+                        <input class="input-submit" type="submit" name="delGroup" value="Delete">
+                    </form>
+                </th>
+            </tr>
+        {% endfor %}
+
+    </table>
+
+</div>
+
+<script>
+    function myFunction(id) {
+        var x = document.getElementById(id);
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+    function mainDivs(first, second) {
+        var x = document.getElementById(first);
+        var y = document.getElementById(second);
+        y.style.display = "none";
+        x.style.display = "block";
+    }
+</script>
